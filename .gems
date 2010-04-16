@@ -1,0 +1,2 @@
+sinatra --version '1.0
+net-dns --version '0.6.1'
