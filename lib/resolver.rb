@@ -1,27 +1,36 @@
 require 'rubygems'
-require 'sinatra'
+require 'sinatra/base'
 require 'erb'
-
 # http://rubygems.org/gems/net-dns
 require 'net/dns/resolver'
 
-configure do
-  @@r = Net::DNS::Resolver.new
+module Resolver
+
+  class Application < Sinatra::Base
+    mime_type :text, 'text/plain'
+
+    def initialize
+      super
+      @r = Net::DNS::Resolver.new
+    end
+
+    before do
+      # cache all responses for 5 minutes
+      expires 300, :public
+    end
+
+    get '/' do
+      erb :index
+    end
+
+    get '/:question/?:type?' do
+      content_type :text
+      @r.send(params[:question], params[:type]).answer.collect { |a| a.type_inspect }.join("\n")
+    end
+
+  end
 end
 
-after do
-  # cache all responses for 5 minutes
-  expires 300, :public
-end
-
-get '/' do
-  erb :index
-end
-
-get '/:question/?:type?' do
-  content_type 'text/plain', :charset => 'utf-8'
-  @@r.send(params[:question], params[:type]).answer.collect { |a| a.type_inspect }.join("\n")
-end
 
 #
 # The individual Net::DNS::RR instances have different accessor methods
