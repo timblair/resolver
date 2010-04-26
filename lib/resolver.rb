@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'sinatra/base'
 require 'erb'
-# http://rubygems.org/gems/net-dns
-require 'net/dns/resolver'
+require 'json'
+require 'net/dns/resolver' # http://rubygems.org/gems/net-dns
 
 module Resolver
 
   class Application < Sinatra::Base
-    mime_type :text, 'text/plain'
+    mime_type :js, 'text/javascript'
 
     def initialize
       super
@@ -24,8 +24,15 @@ module Resolver
     end
 
     get '/:question/?:type?' do
-      content_type :text
-      @r.send(params[:question], params[:type]).answer.collect { |a| a.type_inspect }.join("\n")
+      content_type :js
+      a = @r.send(params[:question], params[:type]).answer.collect { |a| a.type_inspect }
+      !params[:callback].nil? ? wrap_jsonp(params[:callback], a.to_json) : a.to_json
+    end
+
+    private
+
+    def wrap_jsonp(callback, data)
+      callback + "(" + data + ")"
     end
 
   end

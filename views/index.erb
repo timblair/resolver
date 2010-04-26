@@ -1,9 +1,11 @@
 <html>
   <body>
     <h1>DNS Resolver Web Service</h1>
+    <p>Returns a Javascript array (or JSONP packet if given a <code>callback</code> query string parameter) for the given question.</p>
     <p>Usage examples:</p>
     <pre>
       GET <a href="/google.com">/google.com</a>
+      GET <a href="/google.com?callback=announce">/google.com?callback=announce</a>
       GET <a href="/google.com/MX">/google.com/MX</a>
       GET <a href="/www.google.com/CNAME">/www.google.com/CNAME</a>
       GET <a href="/74.125.148.11">/74.125.148.11</a>
